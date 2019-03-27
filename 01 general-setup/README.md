@@ -17,7 +17,13 @@
  - OpenSSL (v1.1.1b 26-Feb-2019) (installer for Windows: https://slproweb.com/products/Win32OpenSSL.html)
 
 
-#### 2. Running RabbitMQ in Docker
+#### 2. Setting um VM Hints
+
+Remarks:
+- Add host-only
+- share folder
+
+#### 3. Running RabbitMQ in Docker
 
 Get image:
 ````
@@ -43,3 +49,24 @@ Copy file from container to host (and vice versa):
 ````
 docker container cp my-rabbit-container:/etc/rabbitmq/rabbitmq.conf .
 ````
+
+
+#### 4. OpenSSL Hints
+
+- Find the location of the OpenSSL configuration file (openssl.cnf)
+  ````
+  // check the OPENSSLDIR for the cnf file
+  openssl version -a
+  ````
+ 
+- Show details about commands:
+  ````
+  // openssl {cmd} -help
+  openssl x509 -help
+  openssl req -help
+  ````
+
+- Show details of a certificate:
+  ````
+  openssl x509 -in mycertificate.pem -text
+  ````

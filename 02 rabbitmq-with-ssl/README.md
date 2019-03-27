@@ -26,13 +26,24 @@ openssl genrsa -out dm.ca.key.pem 2048
 openssl req -x509 -new -key dm.ca.key.pem -sha256 -days 1825 -out dm.ca.cert.pem
 ````
 
+Remarks:
+- You are prompted for the certificate properties. The actual values don't matter for the CA.
+
+- View the created certificate:
+  ````
+  openssl x509 -in dm.ca.cert.pem -text
+  ````
+  Make sure that the X509v3 extensions list the basic constraint ````CA:TRUE````. This is the default for `req`-command defined in the `openssl.cnf` configuration-file 
+
+---
+
 #### 2. Create Server Certificate
 
 Create a server certificate that is issued by the self-signed CA.
 
 ````
 // 1. generate key for server
-openssl genrsa -out dm.rabbitmq.key.pem 2048
+openssl genrsa -out dm.server.key.pem 2048
 ````
 
 ````
@@ -40,39 +51,34 @@ openssl genrsa -out dm.rabbitmq.key.pem 2048
 // this request will be processed by the owner of the ca to generate the certificate.
 // specify details for the certificate. 
 // important: Common Name (cn) is later used by client to identify server (use IP address or similar).
-openssl req -new -key dm.rabbitmq.key.pem -out dm.rabbitmq.csr -days 1825 
-            -subj "/C=CH/ST=ZG/L=Rotkreuz/O=Roche/OU=RMD-STING/CN=x800dm.com" -outform PEM  -nodes 
+openssl req -new -key dm.server.key.pem -days 1000 
+            -subj "/C=CH/ST=ZG/L=Rotkreuz/O=Roche/OU=RMD-STING/CN=x800dm" 
+            -out dm.server.csr.pem -outform PEM -nodes  
 ````
 
 ````
 // 3. sign the request.
 // hint: this can be done with "x509" ro "ca" commnad.
-openssl x509 -req -in dm.rabbitmq.csr -CA dm.ca.cert.pem -CAkey dm.ca.key.pem 
-             -CAcreateserial -extfile v3.ext -days 500 -sha256
-             -out dm.rabbitmq.cert.crt 
+openssl x509 -req -in dm.server.csr.pem -CA dm.ca.cert.pem -CAkey dm.ca.key.pem 
+             -CAcreateserial -extfile v3-extensions-server.ext -days 1000 -sha256
+             -out dm.server.cert.pem 
 ````
 
 Remarks about the signing step:
-- "-CAcreateserial" -> also creates a file with "{ca}.srl" with the last used serialnumber
+- `-CAcreateserial` > also creates a file with "{ca}.srl" with the last used serialnumber
 - We need x509 **v3** certificates ( see https://www.openssl.org/docs/manmaster/man5/x509v3_config.html and https://tools.ietf.org/html/rfc5280)
-- "-extfile v3.ext" -> The content of the file v3.ext is the following  
+- `-extfile` > file with X509v3 extension to add. 
+- The file `v3-extensions-server.ext` contains the following information: 
+  ````
+  authorityKeyIdentifier=keyid,issuer
+  basicConstraints=CA:FALSE
+  keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+  extendedKeyUsage = serverAuth
+  ````
 
-**TODO: should aslo specify -config req.cnf **
-
-````
-authorityKeyIdentifier=keyid,issuer
-basicConstraints=CA:FALSE
-keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
-extendedKeyUsage = serverAuth, clientAuth, codeSigning, emailProtection
-````
-
-
-````
-// 4. convert crt to pem  (RabbitMQ requires pem)
-openssl x509 -inform pem -in dm.rabbitmq.cert.crt -out dm.rabbitmq.cert.pem
-````
-
-Remark: Key or certs are in PEM format when the file's content is readable (base64) and begins with `-----BEGIN`.
+General remarks:
+- RabbitMQ requires pem-formatted certificate/keys. 
+- Keys and/or certs are in PEM format when the file's content is readable (base64) and begins with `-----BEGIN`.
 
 ---
 
@@ -97,8 +103,8 @@ Name the file `rabbitmq.config`:
     { ssl_listeners, [5671] },
     { ssl_options, [
       {cacertfile,"/home/certificates/dm.ca.cert.pem"},
-      {certfile,"/home/certificates/dm.rabbitmq.cert.pem"},
-      {keyfile,"/home/certificates/dm.rabbitmq.key.pem"},
+      {certfile,"/home/certificates/dm.server.cert.pem"},
+      {keyfile,"/home/certificates/dm.server.key.pem"},
       {verify,verify_peer},
       {fail_if_no_peer_cert,false},
       {versions, ['tlsv1.2', 'tlsv1.1']}
@@ -122,13 +128,11 @@ Remarks:
 
 Create the following dockerfile (name it `Dockerfile`):
 
-**TODO: Why apt-get update**
 ````
 FROM rabbitmq:3-management
 
-RUN apt-get update \
-        && mkdir -p /home/certificates \
-        && chmod 777 /home/certificates
+RUN mkdir -p /home/certificates \
+    && chmod 777 /home/certificates
 COPY dm.rabbitmq.key.pem dm.rabbitmq.cert.pem dm.ca.cert.pem /home/certificates/
 RUN chmod 777 /home/certificates/*
 
@@ -136,7 +140,7 @@ COPY rabbitmq.config /etc/rabbitmq/.
 ````
 
 Remarks:
-- The path to the rabbitmq-configuration (above: `/etc/rabbitmq/.`) can be read from the log-files: it lists the path at the beginning.
+- The path to the rabbitmq-configuration (above: `/etc/rabbitmq/.`) can be read from the rabbitmq log-files: it lists the path at the beginning.
 - Just placing a 'rabbitmq.config' seems to overrule the configuration 'rabbitmq.conf' (new style) that is used by default by the container. 
 - Not sure about access-rights. Used 777 to be on the safe side...  
 
@@ -189,7 +193,7 @@ var factory = new ConnectionFactory
         Enabled = true,
         Version = SslProtocols.Tls12,
         AcceptablePolicyErrors = SslPolicyErrors.RemoteCertificateNameMismatch |
-                                 SslPolicyErrors.RemoteCertificateChainErrors,
+                                 SslPolicyErrors.RemoteCertificateChainErrors
     }
 };
 ````
@@ -199,7 +203,7 @@ Add&debug this callback to check that the right server certificate is received.
 - https://www.rabbitmq.com/releases/rabbitmq-dotnet-client/v3.3.0/rabbitmq-dotnet-client-3.3.0-api-guide.pdf
 
 
-##### 4.2 Test with .NET Client - Valide server-certificate
+##### 4.2 Test with .NET Client - Validate server-certificate
 
 Install the DM-CA to the trusted root certificate authorities in Windows:
  
@@ -226,14 +230,14 @@ var factory = new ConnectionFactory
     {
         Enabled = true,
         Version = SslProtocols.Tls12,
-        ServerName = "x800dm.com",
+        ServerName = "x800dm"
     }
 };
 ````
 Reamrks:
 - Installing the cert to the trusted CAs got rid of the `SslPolicyErrors.RemoteCertificateChainErrors` error.
-- Adding `ServerName` gets rid of the 'SslPolicyErrors.RemoteCertificateNameMismatch` error -
-  **if** the server-name matches the CN of the server-certificate.
+- Adding `ServerName` gets rid of the `SslPolicyErrors.RemoteCertificateNameMismatch` error -
+  **if** the server-name matches the CN of the server-certificate (see 2.2).
 
 
 

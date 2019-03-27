@@ -12,6 +12,7 @@ namespace simple_console
     {
         public static void Main()
         {
+            X509Certificate2 clientCert = new X509Certificate2(@"C:\add-correct-path\instrument.client.cert.pfx", String.Empty);
             var factory = new ConnectionFactory
             {
                 HostName = "192.168.56.102",
@@ -22,11 +23,14 @@ namespace simple_console
                 Ssl = new SslOption
                 {
                     Enabled = true,
+
                     Version = SslProtocols.Tls12,
-                    // ServerName = "x800dm",
+                    ServerName = "x800dm",
                     // AcceptablePolicyErrors = SslPolicyErrors.RemoteCertificateNameMismatch |
                     //                          SslPolicyErrors.RemoteCertificateChainErrors,
-                    // CertificateValidationCallback = CertificateValidationCallback
+                    Certs = new X509CertificateCollection(new X509Certificate[] { clientCert })
+                    // CertificateSelectionCallback = CertificateSelectionCallback
+                    // CertPath = @"C:\add-correct-path\instrument.client.cert.pfx"
                 }
             };
 
@@ -54,7 +58,7 @@ namespace simple_console
             Console.ReadLine();
         }
 
-        private static bool CertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        private static X509Certificate CertificateSelectionCallback(object sender, string targetHost, X509CertificateCollection localCertificates, X509Certificate remoteCertificate, string[] acceptableIssuers)
         {
             throw new NotImplementedException();
         }
