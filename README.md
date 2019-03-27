@@ -1,14 +1,15 @@
 # proto-rabbitmq-with-ssl
 
-Technology: RabbitMQ
-Goal: Try out different ways how to authenticate the client.
+Technology: RabbitMQ / OpenSSL
+
+Goal: Try out different ways how to authenticate client.
 
 Contents:
-1. General setup
-2. Server-authentication (enable ssl)
-3. Client-authentication
- 3a. Using central CA on server for issue client-certificates
- 3b. Using self-signed client-certificate
- 3c. Using RabbitMQ plugin "Certificate Trust Store"
-4. Use client-certificate for RabbitMQ user-authentication
+01. General setup
+02. Server-authentication (enable ssl)
+03. Client-authentication - where client-cert is signed by same CA as server-cert
+04. Client-authentication - where client-cert is signed by dedicated CA 
+05. Client-authentication - where client-cert is self-signed (no CA) => **FAILURE**
+06. Client-authentication - Using RabbitMQ plugin "Certificate Trust Store"
+07. Use client-certificate for RabbitMQ user-authentication
 

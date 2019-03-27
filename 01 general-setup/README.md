@@ -2,7 +2,7 @@
 
 ## 01: General Setup
 
-#### 1. Environments
+### 01.1 Environments
 
 **DM: RabbitMQ-broker (server)** (runs in VirtualBox)
  - Ubuntu (18.04.2, Desktop image)
@@ -16,14 +16,19 @@
  - RabbitMQ .NET client (v5.1.0) (Nuget)
  - OpenSSL (v1.1.1b 26-Feb-2019) (installer for Windows: https://slproweb.com/products/Win32OpenSSL.html)
 
+---
 
-#### 2. Setting um VM Hints
+### 01.2 Setting um VM Hints
+
+**TODO**
 
 Remarks:
 - Add host-only
 - share folder
 
-#### 3. Running RabbitMQ in Docker
+---
+
+### 01.3 Running RabbitMQ in Docker
 
 Get image:
 ````
@@ -50,8 +55,9 @@ Copy file from container to host (and vice versa):
 docker container cp my-rabbit-container:/etc/rabbitmq/rabbitmq.conf .
 ````
 
+---
 
-#### 4. OpenSSL Hints
+### 01.4 OpenSSL Hints
 
 - Find the location of the OpenSSL configuration file (openssl.cnf)
   ````

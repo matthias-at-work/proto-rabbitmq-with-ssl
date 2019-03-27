@@ -23,7 +23,7 @@ openssl genrsa -out dm.ca.key.pem 2048
 
 // generate (self signed) root CA certificate
 // hint: the 'openssl req'-command generates and processes certificate signing requests (CSR).
-openssl req -x509 -new -key dm.ca.key.pem -sha256 -days 1825 -out dm.ca.cert.pem
+openssl req -x509 -new -key dm.ca.key.pem -sha256 -days 1000 -out dm.ca.cert.pem
 ````
 
 Remarks:
@@ -51,7 +51,7 @@ openssl genrsa -out dm.server.key.pem 2048
 // this request will be processed by the owner of the ca to generate the certificate.
 // specify details for the certificate. 
 // important: Common Name (cn) is later used by client to identify server (use IP address or similar).
-openssl req -new -key dm.server.key.pem -days 1000 
+openssl req -new -key dm.server.key.pem 
             -subj "/C=CH/ST=ZG/L=Rotkreuz/O=Roche/OU=RMD-STING/CN=x800dm" 
             -out dm.server.csr.pem -outform PEM -nodes  
 ````
