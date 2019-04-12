@@ -10,8 +10,10 @@ where *the client-certificate is self-signed*.
 #### 05.1 Create self-signed client-certificate
 
 ````
+// create key
 openssl genrsa -out instrument.client.key.pem 2048
 
+// create certificate: use also as CA!
 openssl req -new -subj /CN=Instrument -key instrument.client.key.pem 
             -out instrument.client.csr.pem
 

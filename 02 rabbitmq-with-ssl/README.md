@@ -41,42 +41,46 @@ Remarks:
 
 Create a server certificate that is issued by the self-signed CA.
 
-````
-// 1. generate key for server
-openssl genrsa -out dm.server.key.pem 2048
-````
+1. **Generate key for server**
 
-````
-// 2. create certificate signing request (csr) 
-// this request will be processed by the owner of the ca to generate the certificate.
-// specify details for the certificate. 
-// important: Common Name (cn) is later used by client to identify server (use IP address or similar).
-openssl req -new -key dm.server.key.pem 
+   ````
+   openssl genrsa -out dm.server.key.pem 2048
+   ````
+
+2. **Create certificate signing request (csr)** 
+   ````
+   // this request will be processed by the owner of the ca to generate the certificate.
+   // specify details for the certificate. 
+   // important: Common Name (cn) is later used by client to identify server (use IP address or similar).
+   openssl req -new -key dm.server.key.pem 
             -subj "/C=CH/ST=ZG/L=Rotkreuz/O=Roche/OU=RMD-STING/CN=x800dm" 
             -out dm.server.csr.pem -outform PEM -nodes  
-````
+   ````
 
-````
-// 3. sign the request.
-// hint: this can be done with "x509" ro "ca" commnad.
-openssl x509 -req -in dm.server.csr.pem -CA dm.ca.cert.pem -CAkey dm.ca.key.pem 
+3. **Sign the request**
+  - For this step, we need a file called `v3-extensions-server.ext` (in the working folder) with the following contents:
+    ````
+    authorityKeyIdentifier=keyid,issuer
+    basicConstraints=CA:FALSE
+    keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+    extendedKeyUsage = serverAuth
+    ````
+
+  - Now sign the request:
+    ````
+    // hint: this can be done with "x509" ro "ca" commnad.
+    openssl x509 -req -in dm.server.csr.pem -CA dm.ca.cert.pem -CAkey dm.ca.key.pem 
              -CAcreateserial -extfile v3-extensions-server.ext -days 1000 -sha256
              -out dm.server.cert.pem 
-````
+    ````
 
-Remarks about the signing step:
-- `-CAcreateserial` > also creates a file with "{ca}.srl" with the last used serialnumber
-- We need x509 **v3** certificates ( see https://www.openssl.org/docs/manmaster/man5/x509v3_config.html and https://tools.ietf.org/html/rfc5280)
-- `-extfile` > file with X509v3 extension to add. 
-- The file `v3-extensions-server.ext` contains the following information: 
-  ````
-  authorityKeyIdentifier=keyid,issuer
-  basicConstraints=CA:FALSE
-  keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
-  extendedKeyUsage = serverAuth
-  ````
+    - `-CAcreateserial` > also creates a file with "{ca}.srl" with the last used serialnumber
+    - We need x509 **v3** certificates ( see https://www.openssl.org/docs/manmaster/man5/x509v3_config.html and https://tools.ietf.org/html/rfc5280)
+    - `-extfile` > file with X509v3 extension to add. 
 
-General remarks:
+
+
+*General remarks*:
 - RabbitMQ requires pem-formatted certificate/keys. 
 - Keys and/or certs are in PEM format when the file's content is readable (base64) and begins with `-----BEGIN`.
 
@@ -133,7 +137,7 @@ FROM rabbitmq:3-management
 
 RUN mkdir -p /home/certificates \
     && chmod 777 /home/certificates
-COPY dm.rabbitmq.key.pem dm.rabbitmq.cert.pem dm.ca.cert.pem /home/certificates/
+COPY dm.server.key.pem dm.server.cert.pem dm.ca.cert.pem /home/certificates/
 RUN chmod 777 /home/certificates/*
 
 COPY rabbitmq.config /etc/rabbitmq/.

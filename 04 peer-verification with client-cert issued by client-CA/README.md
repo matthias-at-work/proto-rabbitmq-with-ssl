@@ -53,7 +53,7 @@ cat dm.ca.cert.pem instrument.ca.cert.pem > bundled-ca-certs.pem
 3.4 Update Dockerfile:
 Make sure bundle is copied into container:
 ````
-COPY dm.server.key.pem dm.server.cert.pem bundled-ca-certs /home/certificates/
+COPY dm.server.key.pem dm.server.cert.pem bundled-ca-certs.pem /home/certificates/
 ````
 
 3.5 Build image and run container
