@@ -35,7 +35,14 @@ openssl req -new -key instrument.client.key.pem
                 -CAcreateserial -extfile v3-extensions-client.ext -days 1000 -sha256 \
                 -out instrument.client.cert.pem
    ````
-
+   where the file `v3-extensions-client.ext` contains:
+   ````
+   authorityKeyIdentifier=keyid,issuer
+   basicConstraints=CA:FALSE
+   keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+   extendedKeyUsage = clientAuth 
+   ````
+   
 3. Copy the signed certificate (`instrument.client.cert.pem`) and 
    the CA-certificate (`dm.ca.cert.pem`) back to the client (Instrument/Windows).
 
@@ -51,7 +58,7 @@ openssl req -new -key instrument.client.key.pem
  {fail_if_no_peer_cert,true},
 ````
 Remarks:
-- The `cacertfile` stay as it was as still only one CA is in use for both server and client.
+- The `cacertfile` stays as it was because there is still only one CA in use for both server and client certificate.
 
 2. Build new image and run:
 ````
