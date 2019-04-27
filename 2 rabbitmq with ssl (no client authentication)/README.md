@@ -1,17 +1,16 @@
 ### proto-rabbitmq-with-ssl
 
-## 02: Server authenticaion (enable SSL)
+## 2. Server authenticaion (enable SSL)
 
 **Goal: Enable SSL/TLS with RabbitMQ.** Only server authentication. No client authentication yet.
 
+- [2.1 Create CA](#21-create-ca)
 
 Preliminary remarks:
 
 - All the SSL-handling in RabbitMQ is provided by Erlang runtime. When in doubt about RabbitMQ config properties, it is helpful to check comments of underlying erlang implementation. See http://erlang.org/doc/man/ssl.html for info/comments on parameters.
 
-- 
-
-#### 1. Create CA
+#### 2.1 Create CA
 
 Create a certificate authority on the server.
 
@@ -37,7 +36,7 @@ Remarks:
 
 ---
 
-#### 2. Create Server Certificate
+#### 2.2 Create Server Certificate
 
 Create a server certificate that is issued by the self-signed CA.
 
@@ -58,7 +57,7 @@ Create a server certificate that is issued by the self-signed CA.
    ````
 
 3. **Sign the request**
-  - For this step, we need a file called `v3-extensions-server.ext` (in the working folder) with the following contents:
+  - For this step, create a file called `v3-extensions-server.ext` (in the working folder) with the following contents:
     ````
     authorityKeyIdentifier=keyid,issuer
     basicConstraints=CA:FALSE
@@ -86,7 +85,7 @@ Create a server certificate that is issued by the self-signed CA.
 
 ---
 
-#### 3. Create rabbitMQ docker-image with SSL enabled
+#### 2.3 Create rabbitMQ docker-image with SSL enabled
 
 There are different ways how to achieve a container with ssl enabled and the necessary security keys accessible:
 
@@ -96,7 +95,7 @@ There are different ways how to achieve a container with ssl enabled and the nec
  
 I go with approach 2.
 
-##### 3.1 Create a new rabbitMQ configuration file:
+##### 2.3.1 Create a new rabbitMQ configuration file
 
 Name the file `rabbitmq.config`:
 ````
@@ -128,7 +127,7 @@ Remarks:
 - With this configuration, port 5672 is still accessible/operatable without tls. 
 
 
-##### Dockerfile:
+##### 2.3.2 Create Dockerfile
 
 Create the following dockerfile (name it `Dockerfile`):
 
@@ -148,7 +147,7 @@ Remarks:
 - Just placing a 'rabbitmq.config' seems to overrule the configuration 'rabbitmq.conf' (new style) that is used by default by the container. 
 - Not sure about access-rights. Used 777 to be on the safe side...  
 
-##### 3.3 Build & Run image
+##### 2.3.3 Build & Run image
 
 Build:
 ````
@@ -169,9 +168,9 @@ docker container rm my-rabbit-container
 
 ---
 
-#### 4. Test with Client
+#### 2.4 Test with Client
 
-##### 4.1 Test with OpenSSL
+##### 2.4.1 Test with OpenSSL
 
 On windows, use OpenSSL to test the connection:
 
@@ -184,7 +183,7 @@ openssl s_client -connect 192.168.56.102:5671 -state -debug
 ````
 
 
-##### 4.2 Test with .NET Client - Ignore server-certificate
+##### 2.4.2 Test with .NET Client - Ignore server-certificate
 
 Use the following connection-factory setting in the .NET client:
 ````
@@ -207,7 +206,7 @@ Add&debug this callback to check that the right server certificate is received.
 - https://www.rabbitmq.com/releases/rabbitmq-dotnet-client/v3.3.0/rabbitmq-dotnet-client-3.3.0-api-guide.pdf
 
 
-##### 4.2 Test with .NET Client - Validate server-certificate
+##### 2.4.3 Test with .NET Client - Validate server-certificate
 
 Install the DM-CA to the trusted root certificate authorities in Windows:
  
