@@ -6,9 +6,9 @@
 where *the client-certificate is issued by the same CA that also issued the server-certificate* (DM-CA).
 
 *Contents*:
-- [3.1.1 Create Client-key and certificate signing request](#311-create-clientkey-and-certificate-signing-request)
-- [3.1.2 Sign CSR by DM-CA](#312-sign-csr-by-dmca)
-- [3.1.3 Enable Mutual-Authentication in RabbitMQ](#313-enable-mutualauthentication-in-rabbitmq)
+- [3.1.1 Create Client-key and certificate signing request](#311-create-client-key-and-certificate-signing-request)
+- [3.1.2 Sign CSR by DM-CA](#312-sign-csr-by-dm-ca)
+- [3.1.3 Enable Mutual-Authentication in RabbitMQ](#313-enable-mutual-authentication-in-rabbitmq)
 - [3.1.4 Test with Client](#314-test-with-client)
 
 ---

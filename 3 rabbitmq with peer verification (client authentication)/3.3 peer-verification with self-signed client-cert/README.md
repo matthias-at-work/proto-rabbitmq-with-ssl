@@ -1,13 +1,21 @@
 ### proto-rabbitmq-with-ssl
 
-## 05: Peer-verification - with self-signed client-cert
+## 3.3: Peer-verification - with self-signed client-cert
 
 **Goal**: Enable peer-verification by client-certificate - 
 where *the client-certificate is self-signed*.
 
-**Result**: **This doesn't work!**
+**Result**: **This doesn't work!**  (would work with **Trust-Store** plugin! See Section 5.)
 
-#### 05.1 Create self-signed client-certificate
+
+*Contents*:
+- [3.3.1 Create self-signed client-certificate](#331-create-self-signed-client-certificate)
+- [3.3.2 Update RabbitMQ](#332-update-rabbitmq)
+- [3.3.3 Test with Client](#333-test-with-client)
+
+---
+
+#### 3.3.1 Create self-signed client-certificate
 
 ````
 // create key
@@ -23,7 +31,7 @@ openssl x509 -req -in instrument.client.csr.pem -signkey instrument.client.key.p
 ````
 ---
 
-#### 05.2 Update RabbitMQ
+#### 3.3.2 Update RabbitMQ
 
 1. Copy the self-signed `instrument.client.cert.pem` to the DM/server.
 
@@ -52,7 +60,7 @@ docker container run -d --hostname my-rabbit-host --name my-rabbit-container -p 
 
 ---
 
-#### 05.3 Test with Client
+#### 3.3.3 Test with Client
 
 => Failure with OpenSSL (`openssl s_client`) as well as with .NET-client:
 Authentication fails on server with `Bad Certificate`. 

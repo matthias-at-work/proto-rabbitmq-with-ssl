@@ -1,11 +1,19 @@
 ### proto-rabbitmq-with-ssl
 
-## 04: Client authenticaion - with self-signed client-cert
+## 3.2: Client authenticaion - with self-signed client-cert
 
 **Goal**: Enable peer-verification by client-certificate - 
 where *the client-certificate is issued by a dedicated Instrument-CA* (which has nothing shared with the server/DM-CA).
 
-#### 04.1 Create instrument-CA
+*Contents*:
+- [3.2.1 Create instrument-CA](#321-create-instrument-ca)
+- [3.2.2 Create Client-certificate signed by instrument-CA](#322-create-client-certificate-signed-by-instrument-ca)
+- [3.2.3 Update RabbitMQ](#323-update-rabbitmq)
+- [3.2.4 Test with Client](#324-test-with-client)
+
+---
+
+#### 3.2.1 Create instrument-CA
 
 Do the following on Instrument/Windows (analog to DM-CA described earlier):
 
@@ -15,7 +23,7 @@ openssl req -x509 -new -key instrument.ca.key.pem -sha256 -days 1000 -out instru
 ````
 ---
 
-#### 04.2 Create Client-certificate signed by instrument-CA
+#### 3.2.2 Create Client-certificate signed by instrument-CA
 
 Do the following on Instrument/Windows (analog to DM-Server described earlier):
 
@@ -32,7 +40,7 @@ openssl x509 -req -in instrument.client.csr.pem -CA instrument.ca.cert.pem -CAke
 ````
 ---
 
-#### 04.3 Update RabbitMQ
+#### 3.2.3 Update RabbitMQ
 
 3.1 Copy the `instrument.ca.cert.pem` to the DM/server.
 
@@ -64,9 +72,9 @@ docker container run -d --hostname my-rabbit-host --name my-rabbit-container -p 
 
 ---
 
-#### 04.4 Test with Client
+#### 3.2.4 Test with Client
 
-##### 04.4.1 Test with OpenSSL
+##### 3.2.4.1 Test with OpenSSL
 
 On windows, use OpenSSL to test the connection (the `CAfile`-param needs adjustment:
 
@@ -85,7 +93,7 @@ C = ch, ST = zh, L = zurich, O = home, OU = home unit, CN = instrument
 The rabbitMQ-log file shows that the connection succeeded.
 
 
-##### 04.4.2 Test with .NET Client - Ignore server-certificate
+##### 3.2.4.2 Test with .NET Client - Ignore server-certificate
 
 1. Create a pfx/p12 cert for .NET usage.
 ````

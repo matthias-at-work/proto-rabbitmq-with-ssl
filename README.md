@@ -6,25 +6,41 @@ Technology: RabbitMQ / OpenSSL
 
 Goal: Try out different ways how to authenticate client.
 
-Contents:
-01. General setup
-02. Server-authentication (enable ssl)
-03. Client-authentication - where client-cert is signed by same CA as server-cert
-04. Client-authentication - where client-cert is signed by dedicated CA 
-05. Client-authentication - where client-cert is self-signed (no CA) => **FAILURE**
-06. Client-authentication - Using RabbitMQ plugin "Certificate Trust Store"
-07. Use client-certificate for RabbitMQ user-authentication
-10. Federation (without TLS)
-11. Federation with TLS: Server authenticaiton only
-12. Federation over TLS: Mutual authentication with client-cert signed by server-CA
-13. Federation over TLS: Mutual authentication with self-signed client-cert
+---
+
+#### Table of Contents ####
+
+1. **General setup**
+2. **RabbitMQ with SSL** (no client authentication)
+3. **RabbitMQ with peer verification** (client authentication)
+
+   3.1 Client-authentication - where client-cert is signed by same CA as server-cert
+
+   3.2 Client-authentication - where client-cert is signed by a different CA 
+
+   3.3 Client-authentication - where client-cert is self-signed (no CA)
+
+4. **Federation**
+
+   4.1 Federation (without TLS)
+
+   4.2 Federation with TLS: Server authenticaiton only
+
+   4.3 Federation over TLS: Peer verification (with client- and server-certificates)
+
+   4.4 Federation over TLS: Peer verification (with self-signed client-cert)
+
+5. **RabbitMQ plugin "Certificate Trust Store"**
 
 
 ---
+
 #### Warning ####
 
 - Be careful when copy&paste code. 
   Some exmaples use code that spans across lines - and this is not well formatted everywhere (e.g. Linux `\` is missing).
+
+- OpenSSL configuration files are not yet properly documented.
 
 ---
 
@@ -37,7 +53,7 @@ Contents:
 
 - Investigate problem with self-signed certificates
 
-- rabbitmq.config file -> use comments: 
+- rabbitmq.config file -> use comments to explain stuff: 
 
   ```` { dafsdf, 12}  %% here a comment ````
 

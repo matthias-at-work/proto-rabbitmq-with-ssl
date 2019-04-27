@@ -7,7 +7,7 @@
 *Contents*:
 - [2.1 Create CA](#21-create-ca)
 - [2.2 Create Server Certificate](#22-create-server-certificate)
-- [2.3 Create SSL-enabled RabbitMQ docker-image](#23-create-sslenabled-rabbitmq-dockerimage)
+- [2.3 Create SSL-enabled RabbitMQ docker-image](#23-create-ssl-enabled-rabbitmq-docker-image)
 - [2.4 Test with Client](#24-test-with-client)
 
 *Preliminary remarks*:
