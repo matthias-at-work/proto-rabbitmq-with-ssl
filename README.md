@@ -36,3 +36,9 @@ Contents:
   See also https://www.rabbitmq.com/ssl.html#manual-certificate-generation
 
 - Investigate problem with self-signed certificates
+
+- rabbitmq.config file -> use comments: 
+
+  ```` { dafsdf, 12}  %% here a comment ````
+
+- 
