@@ -1,11 +1,19 @@
 ### proto-rabbitmq-with-ssl
 
-## 03: Client authenticaion - with common CA
+## 3.1 Client authenticaion - with common CA
 
 **Goal**: Enable peer-verification by client-certificate - 
 where *the client-certificate is issued by the same CA that also issued the server-certificate* (DM-CA).
 
-#### 03.1 Create Client-key and certificate signing request (csr) 
+*Contents*:
+- [3.1.1 Create Client-key and certificate signing request](#311-create-clientkey-and-certificate-signing-request)
+- [3.1.2 Sign CSR by DM-CA](#312-sign-csr-by-dmca)
+- [3.1.3 Enable Mutual-Authentication in RabbitMQ](#313-enable-mutualauthentication-in-rabbitmq)
+- [3.1.4 Test with Client](#314-test-with-client)
+
+---
+
+#### 3.1.1 Create Client-key and certificate signing request 
 
 Do the following on Windows:
 
@@ -23,7 +31,7 @@ openssl req -new -key instrument.client.key.pem
 
 ---
 
-#### 03.2 Sign CSR by DM-CA 
+#### 3.1.2 Sign CSR by DM-CA 
 
 1. Copy the issued certificate signing request (`instrument.client.csr.pem`) to the DM (server).
 
@@ -50,7 +58,7 @@ openssl req -new -key instrument.client.key.pem
 
 ---
 
-#### 03.3 Enable Mutual-Authentication in RabbitMQ
+#### 3.1.3 Enable Mutual-Authentication in RabbitMQ
 
 1. Update the rabbitmq.config to include the following:
 ````
@@ -68,9 +76,9 @@ docker container run -d --hostname my-rabbit-host --name my-rabbit-container -p 
 
 ---
 
-#### 03.4 Test with Client
+#### 3.1.4 Test with Client
 
-##### 03.4.1 Test with OpenSSL
+##### 3.1.4.1 Test with OpenSSL
 
 On windows, use OpenSSL to test the connection:
 
@@ -91,7 +99,7 @@ C = ch, ST = zug, L = zug, O = rmd, OU = rmd, CN = myca
 ````
 
 
-##### 03.4.2 Test with .NET Client - Ignore server-certificate
+##### 3.1.4.2 Test with .NET Client - Ignore server-certificate
 
 1. Create a pfx/p12 cert for .NET usage.
 ````

@@ -4,9 +4,13 @@
 
 **Goal: Enable SSL/TLS with RabbitMQ.** Only server authentication. No client authentication yet.
 
+*Contents*:
 - [2.1 Create CA](#21-create-ca)
+- [2.2 Create Server Certificate](#22-create-server-certificate)
+- [2.3 Create SSL-enabled RabbitMQ docker-image](#23-create-sslenabled-rabbitmq-dockerimage)
+- [2.4 Test with Client](#24-test-with-client)
 
-Preliminary remarks:
+*Preliminary remarks*:
 
 - All the SSL-handling in RabbitMQ is provided by Erlang runtime. When in doubt about RabbitMQ config properties, it is helpful to check comments of underlying erlang implementation. See http://erlang.org/doc/man/ssl.html for info/comments on parameters.
 
@@ -85,7 +89,7 @@ Create a server certificate that is issued by the self-signed CA.
 
 ---
 
-#### 2.3 Create rabbitMQ docker-image with SSL enabled
+#### 2.3 Create SSL-enabled RabbitMQ docker-image
 
 There are different ways how to achieve a container with ssl enabled and the necessary security keys accessible:
 
